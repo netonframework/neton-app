@@ -1,4 +1,4 @@
-# neton-start
+# neton-app
 
 The smallest useful [Neton](https://github.com/netonframework/neton) application: one controller,
 one HTML page, one JSON endpoint. Clone it, run it, then make it yours.
@@ -6,8 +6,8 @@ one HTML page, one JSON endpoint. Clone it, run it, then make it yours.
 ## Run
 
 ```bash
-git clone https://github.com/netonframework/neton-start.git
-cd neton-start
+git clone https://github.com/netonframework/neton-app.git
+cd neton-app
 ./gradlew run
 ```
 
@@ -52,8 +52,8 @@ Routes come from `@Controller` classes; KSP collects them into `GeneratedInitial
 最小可运行的 Neton 应用：一个控制器、一个 HTML 页面、一个 JSON 接口。
 
 ```bash
-git clone https://github.com/netonframework/neton-start.git
-cd neton-start
+git clone https://github.com/netonframework/neton-app.git
+cd neton-app
 ./gradlew run
 ```
 

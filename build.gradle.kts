@@ -59,6 +59,6 @@ tasks.matching { it.name.matches(Regex("compileKotlin(MacosArm64|MacosX64|LinuxX
 // `./gradlew run` builds and starts the executable for whatever machine you are on.
 tasks.register("run") {
     group = "application"
-    description = "Build and run neton-start for the current host."
+    description = "Build and run neton-app for the current host."
     dependsOn("runDebugExecutable$hostTargetCapital")
 }

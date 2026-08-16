@@ -49,7 +49,7 @@ class WelcomeController {
               <main>
                 <h1>Welcome to Neton</h1>
                 <p>If you can see this page, your Neton application is up and serving requests.</p>
-                <p>This is <code>neton-start</code>, a minimal application built on Neton $NETON_VERSION.
+                <p>This is <code>neton-app</code>, a minimal application built on Neton $NETON_VERSION.
                    Edit <code>src/commonMain/kotlin/controller/WelcomeController.kt</code> to make it yours.</p>
                 <ul>
                   <li>JSON endpoint: <a href="/api/hello"><code>/api/hello</code></a></li>

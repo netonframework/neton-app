@@ -5,4 +5,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "neton-start"
+rootProject.name = "neton-app"
