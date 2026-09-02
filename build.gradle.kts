@@ -8,7 +8,7 @@ repositories {
     mavenCentral()
 }
 
-val netonVersion = "1.0.0-beta2"
+val netonVersion = "1.0.0-beta3"
 
 kotlin {
     listOf(macosArm64(), macosX64(), linuxX64(), linuxArm64(), mingwX64()).forEach { target ->
@@ -53,6 +53,11 @@ afterEvaluate {
     }
 }
 tasks.matching { it.name.matches(Regex("compileKotlin(MacosArm64|MacosX64|LinuxX64|LinuxArm64|MingwX64)")) }.configureEach {
+    dependsOn("kspKotlin$hostTargetCapital")
+}
+// The generated sources are added to commonMain, so the metadata compilation reads them too
+// and `./gradlew build` fails on an unresolved GeneratedInitializer without this.
+tasks.matching { it.name == "compileCommonMainKotlinMetadata" }.configureEach {
     dependsOn("kspKotlin$hostTargetCapital")
 }
 
