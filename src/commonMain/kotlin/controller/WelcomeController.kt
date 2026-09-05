@@ -24,7 +24,7 @@ class WelcomeController {
     )
 
     companion object {
-        const val NETON_VERSION = "1.0.0-beta5"
+        const val NETON_VERSION = "1.0.0-beta7"
 
         val WELCOME_PAGE = """
             <!doctype html>
