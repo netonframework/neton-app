@@ -1,7 +1,7 @@
 plugins {
     kotlin("multiplatform") version "2.4.20"
     kotlin("plugin.serialization") version "2.4.20"
-    id("com.google.devtools.ksp") version "2.3.10"
+    id("com.google.devtools.ksp") version "2.3.12"
 }
 
 // Kotlin 版本下限 2.4.20：低于它（包括 2.4.20 的 Beta / RC）直接拒绝编译。
