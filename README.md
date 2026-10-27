@@ -41,6 +41,22 @@ implementation("com.netonstream:neton-redis")
 Routes come from `@Controller` classes; KSP collects them into `GeneratedInitializer`, which
 `Main.kt` passes to `modules(...)`. Add a controller, rebuild, done.
 
+## Following Neton previews
+
+`gradle.properties` pins `netonVersion` for both the framework and KSP. This sample
+tracks published `1.0.0-betaN` / `1.0.0-rcN` builds, not unpublished source snapshots
+or a dynamic `+` dependency. Check manually with `python3 scripts/update-neton.py`;
+add `--write` to update the pin, then build and test before committing.
+
+The preview workflow checks Central every six hours (and on manual dispatch), verifies
+the same candidate on macOS ARM64 and Linux x64, and opens an upgrade PR only when both
+release binaries link. It does not auto-merge or claim runtime/cross-platform acceptance.
+It becomes active after this workflow reaches the default branch and GitHub Actions is
+enabled. Enable “Allow GitHub Actions to create and approve pull requests” in repository
+settings for PR creation; no external dependency bot is needed. Failed builds remain
+visible as failed workflow runs, with the current pin unchanged on the default branch.
+Final `1.0.0` adoption is a deliberate policy change, not an automatic channel switch.
+
 ## Next
 
 - Guide: <https://netonframework.github.io/guide/>
@@ -48,6 +64,11 @@ Routes come from `@Controller` classes; KSP collects them into `GeneratedInitial
 - Database, cache, Redis, events: see the guide sidebar
 
 ## 中文
+
+本项目跟踪 Maven Central 已发布的 Neton 1.0 测试版，框架和 KSP 使用同一个明确版本。
+工作流进入默认分支并启用 Actions 后，每六小时检查一次；macOS ARM64 与 Linux x64
+发布构建均通过才创建升级 PR，不自动合并。需要在仓库设置允许 Actions 创建 PR。
+构建通过不代表运行验收或正式版门禁通过；正式版切换需单独决定。
 
 最小可运行的 Neton 应用：一个控制器、一个 HTML 页面、一个 JSON 接口。
 

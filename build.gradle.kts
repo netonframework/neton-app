@@ -20,7 +20,7 @@ repositories {
     mavenCentral()
 }
 
-val netonVersion = "1.0.0-beta7"
+val netonVersion = providers.gradleProperty("netonVersion").get()
 
 kotlin {
     listOf(macosArm64(), macosX64(), linuxX64(), linuxArm64(), mingwX64()).forEach { target ->

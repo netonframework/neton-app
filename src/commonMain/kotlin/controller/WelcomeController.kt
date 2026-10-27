@@ -1,6 +1,7 @@
 package controller
 
 import kotlinx.serialization.Serializable
+import neton.core.Neton
 import neton.core.annotations.Controller
 import neton.core.annotations.Get
 import neton.core.http.HttpContext
@@ -24,7 +25,7 @@ class WelcomeController {
     )
 
     companion object {
-        const val NETON_VERSION = "1.0.0-beta7"
+        val NETON_VERSION = Neton.VERSION
 
         val WELCOME_PAGE = """
             <!doctype html>

@@ -1,0 +1,87 @@
+name: Published Neton preview
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '19 */6 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            target: MacosArm64
+          - os: ubuntu-24.04
+            target: LinuxX64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python3 scripts/test_update_neton.py
+      - name: Select latest shared preview for scheduled/manual checks
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: python3 scripts/update-neton.py --write
+      - name: Compile and link published dependencies only
+        run: ./gradlew --no-daemon --warning-mode=all compileCommonMainKotlinMetadata linkReleaseExecutable${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        with:
+          name: preview-pin-${{ matrix.target }}
+          path: gradle.properties
+
+  propose-update:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: preview-pin-*
+          path: pins
+      - name: Propose only the version both platforms verified
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmp pins/preview-pin-MacosArm64/gradle.properties pins/preview-pin-LinuxX64/gradle.properties
+          cp pins/preview-pin-MacosArm64/gradle.properties gradle.properties
+          if git diff --quiet -- gradle.properties; then exit 0; fi
+          version=$(sed -n 's/^netonVersion=//p' gradle.properties)
+          branch="automation/neton-$version"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            echo "Update branch already exists; leaving it unchanged."
+            exit 0
+          fi
+          git switch -c "$branch"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add gradle.properties
+          git commit -m "chore: update Neton to $version"
+          git push origin "$branch"
+          gh pr create --base "${{ github.event.repository.default_branch }}" --head "$branch" \
+            --title "chore: update Neton to $version" \
+            --body "Updates the shared framework/KSP pin after macOS and Linux release-link checks. Evidence: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID . No auto-merge. GitHub-token-created PRs may not trigger additional workflows; these checks ran before this PR."
