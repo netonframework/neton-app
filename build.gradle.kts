@@ -67,7 +67,7 @@ kotlin.sourceSets.named("commonMain") {
 }
 afterEvaluate {
     kotlin.sourceSets.findByName("${hostTarget}Main")?.let { ss ->
-        val filtered = ss.kotlin.srcDirs.filter { !it.path.contains("generated/ksp") }
+        val filtered = ss.kotlin.srcDirs.filter { !it.invariantSeparatorsPath.contains("generated/ksp") }
         if (filtered.size < ss.kotlin.srcDirs.size) ss.kotlin.setSrcDirs(filtered)
     }
 }
