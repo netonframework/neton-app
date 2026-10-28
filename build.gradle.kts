@@ -37,7 +37,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // One versioned line: core + logging + http + routing, plus version constraints
-            // for every other neton-* module, so extra modules are added without a version.
+            // for framework modules. Independent AI/compatibility adapters require
+            // their own explicit compatible versions; they are not framework BOM entries.
             implementation("com.netonstream:neton:$netonVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
         }
