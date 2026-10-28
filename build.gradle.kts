@@ -18,6 +18,13 @@ run {
 
 repositories {
     mavenCentral()
+    providers.gradleProperty("neton.repository").orNull?.let { path ->
+        require(file(path).isDirectory) { "Missing candidate repository: $path" }
+        exclusiveContent {
+            forRepository { maven { url = uri(path) } }
+            filter { includeModuleByRegex("com[.]netonstream", "neton(-.*)?") }
+        }
+    }
 }
 
 val netonVersion = providers.gradleProperty("netonVersion").get()

@@ -25,6 +25,8 @@ jobs:
             target: MacosArm64
           - os: ubuntu-24.04
             target: LinuxX64
+          - os: windows-2022
+            target: MingwX64
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
@@ -36,12 +38,28 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python3 scripts/test_update_neton.py
+      - run: python scripts/test_update_neton.py
+      - run: python scripts/test_runtime_smoke.py
       - name: Select latest shared preview for scheduled/manual checks
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-        run: python3 scripts/update-neton.py --write
+        run: python scripts/update-neton.py --write
       - name: Compile and link published dependencies only
+        shell: bash
         run: ./gradlew --no-daemon --warning-mode=all compileCommonMainKotlinMetadata linkReleaseExecutable${{ matrix.target }}
+      - name: Two release runtime cycles
+        shell: bash
+        run: |
+          target='${{ matrix.target }}'
+          target="$(printf '%s' "${target:0:1}" | tr '[:upper:]' '[:lower:]')${target:1}"
+          ext=kexe
+          if [ "$target" = mingwX64 ]; then ext=exe; fi
+          version=$(sed -n 's/^netonVersion=//p' gradle.properties)
+          python scripts/runtime_smoke.py --binary "build/bin/$target/releaseExecutable/neton-app.$ext" --candidate "$version" --output "$RUNNER_TEMP/neton-app-runtime"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: runtime-${{ matrix.target }}
+          path: ${{ runner.temp }}/neton-app-runtime/
       - uses: actions/upload-artifact@v4
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         with:
@@ -68,6 +86,7 @@ jobs:
         run: |
           set -euo pipefail
           cmp pins/preview-pin-MacosArm64/gradle.properties pins/preview-pin-LinuxX64/gradle.properties
+          cmp pins/preview-pin-MacosArm64/gradle.properties pins/preview-pin-MingwX64/gradle.properties
           cp pins/preview-pin-MacosArm64/gradle.properties gradle.properties
           if git diff --quiet -- gradle.properties; then exit 0; fi
           version=$(sed -n 's/^netonVersion=//p' gradle.properties)
@@ -84,4 +103,4 @@ jobs:
           git push origin "$branch"
           gh pr create --base "${{ github.event.repository.default_branch }}" --head "$branch" \
             --title "chore: update Neton to $version" \
-            --body "Updates the shared framework/KSP pin after macOS and Linux release-link checks. Evidence: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID . No auto-merge. GitHub-token-created PRs may not trigger additional workflows; these checks ran before this PR."
+            --body "Updates the shared framework/KSP pin after macOS, Linux and Windows release runtime checks. Evidence: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID . No auto-merge. GitHub-token-created PRs may not trigger additional workflows; these checks ran before this PR."
