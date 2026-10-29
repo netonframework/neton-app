@@ -1,4 +1,4 @@
-"""Find the newest shared 1.0.0 beta/rc in Central; never use dynamic Gradle versions."""
+"""Find the newest shared 1.0.0 release in Central, preferring final over rc/beta."""
 import argparse
 from pathlib import Path
 import re
@@ -11,16 +11,18 @@ PATTERN = re.compile(r"1\.0\.0-(beta|rc)([1-9][0-9]*)", re.I)
 
 
 def version_key(version):
+    if version == "1.0.0":
+        return (2, 0)
     match = PATTERN.fullmatch(version)
     if not match:
-        raise ValueError(f"Unsupported preview version: {version}")
+        raise ValueError(f"Unsupported release version: {version}")
     return (1 if match[1].lower() == "rc" else 0, int(match[2]))
 
 
 def latest_shared(framework, processor):
-    candidates = {v for v in framework if PATTERN.fullmatch(v)} & set(processor)
+    candidates = {v for v in framework if v == "1.0.0" or PATTERN.fullmatch(v)} & set(processor)
     if not candidates:
-        raise ValueError("No shared 1.0.0 beta/rc for neton and neton-ksp")
+        raise ValueError("No shared 1.0.0 release for neton and neton-ksp")
     return max(candidates, key=version_key)
 
 
@@ -41,7 +43,7 @@ def main():
     latest = latest_shared(versions("neton"), versions("neton-ksp"))
     if version_key(latest) < version_key(pins[0]):
         raise ValueError("Central metadata is behind the local pin; refusing downgrade")
-    print(f"Current: {pins[0]}; latest shared preview: {latest}")
+    print(f"Current: {pins[0]}; latest shared release: {latest}")
     if args.write and latest != pins[0]:
         path.write_text(re.sub(r"^netonVersion=\S+$", f"netonVersion={latest}", content, flags=re.M))
 

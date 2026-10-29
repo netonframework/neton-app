@@ -41,21 +41,22 @@ implementation("com.netonstream:neton-redis")
 Routes come from `@Controller` classes; KSP collects them into `GeneratedInitializer`, which
 `Main.kt` passes to `modules(...)`. Add a controller, rebuild, done.
 
-## Following Neton previews
+## Following the Neton 1.0.0 release line
 
 `gradle.properties` pins `netonVersion` for both the framework and KSP. This sample
-tracks published `1.0.0-betaN` / `1.0.0-rcN` builds, not unpublished source snapshots
+pins stable `1.0.0`. Its updater ranks final above `1.0.0-rcN` and `1.0.0-betaN`, not unpublished source snapshots
 or a dynamic `+` dependency. Check manually with `python3 scripts/update-neton.py`;
 add `--write` to update the pin, then build and test before committing.
 
-The preview workflow checks Central every six hours (and on manual dispatch), verifies
-the same candidate on macOS ARM64 and Linux x64, and opens an upgrade PR only when both
-release binaries link. It does not auto-merge or claim runtime/cross-platform acceptance.
+The release workflow checks Central every six hours (and on manual dispatch), verifies
+the same version on macOS ARM64, Linux x64 and Windows x64, and opens an upgrade PR only
+after release linking and two healthy/graceful-stop cycles pass on all three platforms.
+It does not auto-merge or certify database migrations; those belong to the Framework integration gate.
 It becomes active after this workflow reaches the default branch and GitHub Actions is
 enabled. Enable “Allow GitHub Actions to create and approve pull requests” in repository
 settings for PR creation; no external dependency bot is needed. Failed builds remain
 visible as failed workflow runs, with the current pin unchanged on the default branch.
-Final `1.0.0` adoption is a deliberate policy change, not an automatic channel switch.
+Final `1.0.0` adoption is approved. The updater cannot downgrade it to a preview or switch to another release line.
 
 ## Next
 
@@ -65,9 +66,10 @@ Final `1.0.0` adoption is a deliberate policy change, not an automatic channel s
 
 ## 中文
 
-本项目跟踪 Maven Central 已发布的 Neton 1.0 测试版，框架和 KSP 使用同一个明确版本。
-工作流进入默认分支并启用 Actions 后，每六小时检查一次；macOS ARM64 与 Linux x64
-发布构建均通过才创建升级 PR，不自动合并。需要在仓库设置允许 Actions 创建 PR。
+本项目使用 Maven Central 发布的 Neton 1.0.0 正式版，框架和 KSP 使用同一个明确版本。
+每六小时检查一次；macOS ARM64、Linux x64、Windows x64 发布构建及两轮健康启停
+均通过才创建升级 PR，不自动合并。正式版不会回退到测试版或自动切换其他版本线。
+数据库迁移验收由框架集成门禁负责。需要在仓库设置允许 Actions 创建 PR。
 构建通过不代表运行验收或正式版门禁通过；正式版切换需单独决定。
 
 最小可运行的 Neton 应用：一个控制器、一个 HTML 页面、一个 JSON 接口。

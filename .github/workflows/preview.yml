@@ -1,4 +1,4 @@
-name: Published Neton preview
+name: Published Neton release
 
 on:
   push:
@@ -40,7 +40,7 @@ jobs:
           python-version: '3.12'
       - run: python scripts/test_update_neton.py
       - run: python scripts/test_runtime_smoke.py
-      - name: Select latest shared preview for scheduled/manual checks
+      - name: Select latest shared release for scheduled/manual checks
         if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
         run: python scripts/update-neton.py --write
       - name: Compile and link published dependencies only

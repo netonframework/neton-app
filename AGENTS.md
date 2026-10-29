@@ -2,8 +2,8 @@
 
 Use the Neton development skill from the canonical neton-docs `skills/neton-development`
 directory when available. Resolve this application's pinned Framework and KSP versions
-before using examples: beta26 still uses `neton.ws`, while post-beta26 candidates use
-`neton.websocket`. Do not upgrade imports without matching dependencies.
+before using examples: this starter pins stable 1.0.0 with `neton.websocket`.
+Legacy beta26 used `neton.ws`; do not mix legacy imports with stable dependencies.
 
 Use this public application as a minimal server foundation, not an admin product.
 Follow Neton Config SPI, generated controller routes, injected services and owned

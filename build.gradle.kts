@@ -40,7 +40,7 @@ kotlin {
             // for framework modules. Independent AI/compatibility adapters require
             // their own explicit compatible versions; they are not framework BOM entries.
             implementation("com.netonstream:neton:$netonVersion")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.12.0")
         }
     }
 }
